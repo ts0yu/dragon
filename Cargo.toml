@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "crates/executor",
-    "crates/compiler"
+    "crates/compiler",
+    "crates/falbe"
 ]

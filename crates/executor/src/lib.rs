@@ -10,8 +10,6 @@ pub enum Opcode {
     Push(f64),
     /// Jump to a specified instruction in the program by the program counter.
     Jump(usize),
-    /// Jump to a specified program counter if the top of a stack is a specific value.
-    Jumpi(usize, f64),
     /// Set a value in the constant storage context.
     Set(usize),
     /// Get a value from the constant storage context.
@@ -60,7 +58,6 @@ impl Vm {
             match self.instructions[self.pc] {
                 Opcode::Push(value) => self.push(value),
                 Opcode::Jump(pc) => self.jump(pc),
-                Opcode::Jumpi(pc, cond) => self.jumpi(pc, cond),
                 Opcode::Set(key) => self.set(key),
                 Opcode::Get(key) => self.get(key),
                 Opcode::Pop => self.pop(),
@@ -76,12 +73,6 @@ impl Vm {
     /// Jump to a specified program counter and increase program counter.
     fn jump(&mut self, pc: usize) {
         self.pc = pc;
-    }
-
-    fn jumpi(&mut self, pc: usize, cond: f64) {
-        if self.stack[self.stack.len() - 1] == cond {
-            self.pc = pc
-        }
     }
 
     /// Set a key in the storage context to a value and increase program counter.

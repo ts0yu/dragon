@@ -1,0 +1,5 @@
+push 0.1
+push 0.1
+add
+print
+halt
