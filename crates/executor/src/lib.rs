@@ -75,6 +75,28 @@ impl Vm {
         }
     }
 
+    pub fn debug(&mut self) {
+        if !self.instructions.contains(&Opcode::Halt) {
+            println!("{}: no `halt` in program.", "error".red().bold());
+        }
+
+        while self.instructions[self.pc] != Opcode::Halt {
+            match self.instructions[self.pc] {
+                Opcode::Push(value) => self.push(value),
+                Opcode::Jump(pc) => self.jump(pc),
+                Opcode::Set(key) => self.set(key),
+                Opcode::Get(key) => self.get(key),
+                Opcode::Pop => self.pop(),
+                Opcode::Add => self.add(),
+                Opcode::Sub => self.sub(),
+                Opcode::Pc => self.push(self.pc as f64),
+                Opcode::Print => self.pc += 1,
+                Opcode::Halt => continue,
+            }
+            println!("{}: {:?}", self.pc.to_string().magenta().bold(), self.stack);
+        }
+    }
+
     /// Jump to a specified program counter and increase program counter.
     fn jump(&mut self, pc: usize) {
         self.pc = pc;

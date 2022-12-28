@@ -17,6 +17,7 @@ struct Value {
 #[derive(Subcommand)]
 enum Commands {
     Run { path: String },
+    Debug { path: String },
 }
 
 fn main() {
@@ -39,6 +40,18 @@ fn main() {
             println!("{} `{}`", "  Running".green().bold(), path);
 
             vm.execute();
+        },
+        Commands::Debug { path } => {
+            let contents = fs::read_to_string(path).unwrap();
+            let tokens = Token::lex(&contents);
+            let mut vm = Vm::new(
+                Assembler::new(tokens).parse(),
+                HashMap::new()
+            );
+
+            vm.debug();
+
+            println!("{:?}", vm.stack)
         },
     }
 }
