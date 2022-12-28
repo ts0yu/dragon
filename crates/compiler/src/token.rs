@@ -22,6 +22,16 @@ pub enum TokenType {
     Print,
     #[token("halt")]
     Halt,
+    #[token("+")]
+    AddSymb,
+    #[token("-")]
+    SubSymb,
+    #[token("=")]
+    SetSymb,
+    #[token("$")]
+    GetSymb,
+    #[regex(r"[//.*]+", logos::skip)] // Comments
+    Comment,
     #[regex("[+-]?([0-9]*[.])?[0-9]+")]
     Literal,
     // Eof,

@@ -123,6 +123,6 @@ impl Vm {
         let a = self.stack[self.stack.len() - 1];
         let b = self.stack[self.stack.len() - 2];
 
-        self.push(a - b);
+        self.push(b - a);
     }
 }

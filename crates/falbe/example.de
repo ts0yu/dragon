@@ -1,7 +1,7 @@
-1
-2
-add
-3
-add
+// push 4 and 5 to the stack then add together.
+// [4, 5, 9]
+4 5 +
+// print the result
 print
+// stop the program
 halt
