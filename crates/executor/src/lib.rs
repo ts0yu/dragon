@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
 
+use colored::*;
 use std::collections::HashMap;
 
 /// Type representing a Falbe VM opcode.
@@ -54,6 +55,10 @@ impl Vm {
 
     /// Execute the current instruction set.
     pub fn execute(&mut self) {
+        if !self.instructions.contains(&Opcode::Halt) {
+            println!("{}: no `halt` in program.", "error".red().bold());
+        }
+
         while self.instructions[self.pc] != Opcode::Halt {
             match self.instructions[self.pc] {
                 Opcode::Push(value) => self.push(value),

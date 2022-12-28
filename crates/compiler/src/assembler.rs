@@ -30,7 +30,13 @@ impl<'a> Assembler<'a> {
                 TokenType::Pc => opcodes.push(Opcode::Pc),
                 TokenType::Print => opcodes.push(Opcode::Print),
                 TokenType::Halt => opcodes.push(Opcode::Halt),
-                TokenType::Literal => continue,
+                TokenType::Literal => {
+                    if self.tokens[index].slice != "push" {
+                        opcodes.push(Opcode::Push(self.tokens[index].slice.parse::<f64>().unwrap()));
+                    } else {
+                        continue;
+                    }
+                },
                 TokenType::Error => continue,
             }
         }
