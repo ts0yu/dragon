@@ -17,10 +17,16 @@ pub enum Opcode {
     Get(usize),
     /// Pop the top value from the stack
     Pop,
+    /// Duplicate the top value from the stack
+    Dup,
     /// Add the top two values on the stack.
     Add,
     /// Subtract the second deepest stack value from the top value.
     Sub,
+    /// Square root the top of the stack.
+    Sqrt,
+    /// Multiply the top two values on the stack.
+    Mul,
     /// Push the current program counter (pc).
     Pc,
     /// 'Side-effect' opcode; print the top stack value.
@@ -65,8 +71,11 @@ impl Vm {
                 Opcode::Set(key) => self.set(key),
                 Opcode::Get(key) => self.get(key),
                 Opcode::Pop => self.pop(),
+                Opcode::Dup => self.dup(),
                 Opcode::Add => self.add(),
                 Opcode::Sub => self.sub(),
+                Opcode::Mul => self.mul(),
+                Opcode::Sqrt => self.sqrt(),
                 Opcode::Pc => self.push(self.pc as f64),
                 Opcode::Print => self.print(),
                 Opcode::Halt => continue,
@@ -115,6 +124,28 @@ impl Vm {
         let b = self.stack[self.stack.len() - 2];
 
         self.push(a + b);
+    }
+
+    /// Duplicate the top stack value.
+    fn dup(&mut self) {
+        let a = self.stack[self.stack.len() - 1];
+    
+        self.push(a);
+    }
+
+    /// Add the top two stack values and increase program counter.
+    fn mul(&mut self) {
+        let a = self.stack[self.stack.len() - 1];
+        let b = self.stack[self.stack.len() - 2];
+    
+        self.push(a * b);
+    }
+
+    /// Square root the top of the stack.
+    fn sqrt(&mut self) {
+        let a = self.stack[self.stack.len() - 1];
+    
+        self.push(f64::sqrt(a));
     }
 
     /// Subtract the second deepest stack value from the top value and increase program counter.

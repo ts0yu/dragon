@@ -26,17 +26,21 @@ impl<'a> Assembler<'a> {
                 TokenType::Get => opcodes.push(Opcode::Get(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
                 TokenType::Pop => opcodes.push(Opcode::Pop),
                 TokenType::AddSymb => opcodes.push(Opcode::Add),
+                TokenType::MulSymb => opcodes.push(Opcode::Mul),
                 TokenType::SubSymb => opcodes.push(Opcode::Sub),
                 TokenType::SetSymb => opcodes.push(Opcode::Set(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
                 TokenType::GetSymb => opcodes.push(Opcode::Get(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
-                TokenType::Comment => continue,
+                TokenType::Dup => opcodes.push(Opcode::Dup),
                 TokenType::Add => opcodes.push(Opcode::Add),
                 TokenType::Sub => opcodes.push(Opcode::Sub),
+                TokenType::Mul => opcodes.push(Opcode::Mul),
+                TokenType::Sqrt => opcodes.push(Opcode::Sqrt),
                 TokenType::Pc => opcodes.push(Opcode::Pc),
                 TokenType::Print => opcodes.push(Opcode::Print),
                 TokenType::Halt => opcodes.push(Opcode::Halt),
                 TokenType::Literal => continue,
                 TokenType::Error => continue,
+                TokenType::Comment => continue,
             }
         }
         opcodes

@@ -30,6 +30,14 @@ pub enum TokenType {
     SetSymb,
     #[token("$")]
     GetSymb,
+    #[token("mul")]
+    Mul,
+    #[token("dup")]
+    Dup,
+    #[token("*")]
+    MulSymb,
+    #[token("sqrt")]
+    Sqrt,
     #[regex(r"[//.*]+", logos::skip)] // Comments
     Comment,
     #[regex("[+-]?([0-9]*[.])?[0-9]+")]
