@@ -1,11 +1,11 @@
-use std::fs;
-use colored::*;
-use executor::Vm;
-use std::time::Instant;
-use compiler::token::Token;
-use std::collections::HashMap;
 use clap::{Parser, Subcommand};
+use colored::*;
 use compiler::assembler::Assembler;
+use compiler::token::Token;
+use executor::Vm;
+use std::collections::HashMap;
+use std::fs;
+use std::time::Instant;
 
 #[derive(Parser)]
 #[clap(about, version, author)]
@@ -34,11 +34,15 @@ fn main() {
             let opcodes = Assembler::new(tokens).parse();
             let mut vm = Vm::new(opcodes, HashMap::new());
 
-            println!("{} dev [unoptimized] in {:?}", " Finished".green().bold(), now.elapsed());
+            println!(
+                "{} dev [unoptimized] in {:?}",
+                " Finished".green().bold(),
+                now.elapsed()
+            );
 
             println!("{} `{}`", "  Running".green().bold(), path);
 
             vm.execute();
-        },
+        }
     }
 }
