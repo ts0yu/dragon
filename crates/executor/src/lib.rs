@@ -1,8 +1,8 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
 
-use colored::*;
 use std::collections::HashMap;
+use colored::*;
 
 /// Type representing a Falbe VM opcode.
 #[derive(PartialEq, Debug)]
@@ -58,7 +58,6 @@ impl Vm {
         if !self.instructions.contains(&Opcode::Halt) {
             println!("{}: no `halt` in program.", "error".red().bold());
         }
-
         while self.instructions[self.pc] != Opcode::Halt {
             match self.instructions[self.pc] {
                 Opcode::Push(value) => self.push(value),
@@ -72,28 +71,6 @@ impl Vm {
                 Opcode::Print => self.print(),
                 Opcode::Halt => continue,
             }
-        }
-    }
-
-    pub fn debug(&mut self) {
-        if !self.instructions.contains(&Opcode::Halt) {
-            println!("{}: no `halt` in program.", "error".red().bold());
-        }
-
-        while self.instructions[self.pc] != Opcode::Halt {
-            match self.instructions[self.pc] {
-                Opcode::Push(value) => self.push(value),
-                Opcode::Jump(pc) => self.jump(pc),
-                Opcode::Set(key) => self.set(key),
-                Opcode::Get(key) => self.get(key),
-                Opcode::Pop => self.pop(),
-                Opcode::Add => self.add(),
-                Opcode::Sub => self.sub(),
-                Opcode::Pc => self.push(self.pc as f64),
-                Opcode::Print => self.pc += 1,
-                Opcode::Halt => continue,
-            }
-            println!("{}: {:?}", self.pc.to_string().magenta().bold(), self.stack);
         }
     }
 

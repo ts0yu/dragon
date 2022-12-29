@@ -23,25 +23,19 @@ impl<'a> Assembler<'a> {
                 TokenType::Push => opcodes.push(Opcode::Push(self.tokens[index + 1].slice.parse::<f64>().unwrap())),
                 TokenType::Jump => opcodes.push(Opcode::Jump(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
                 TokenType::Set => opcodes.push(Opcode::Set(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
-                TokenType::SetSymb => opcodes.push(Opcode::Set(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
                 TokenType::Get => opcodes.push(Opcode::Get(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
-                TokenType::GetSymb => opcodes.push(Opcode::Get(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
                 TokenType::Pop => opcodes.push(Opcode::Pop),
-                TokenType::Add => opcodes.push(Opcode::Add),
-                TokenType::Sub => opcodes.push(Opcode::Sub),
                 TokenType::AddSymb => opcodes.push(Opcode::Add),
                 TokenType::SubSymb => opcodes.push(Opcode::Sub),
+                TokenType::SetSymb => opcodes.push(Opcode::Set(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
+                TokenType::GetSymb => opcodes.push(Opcode::Get(self.tokens[index + 1].slice.parse::<usize>().unwrap())),
+                TokenType::Comment => continue,
+                TokenType::Add => opcodes.push(Opcode::Add),
+                TokenType::Sub => opcodes.push(Opcode::Sub),
                 TokenType::Pc => opcodes.push(Opcode::Pc),
                 TokenType::Print => opcodes.push(Opcode::Print),
                 TokenType::Halt => opcodes.push(Opcode::Halt),
-                TokenType::Literal => {
-                    if self.tokens[index].slice != "push" {
-                        opcodes.push(Opcode::Push(self.tokens[index].slice.parse::<f64>().unwrap()));
-                    } else {
-                        continue;
-                    }
-                },
-                TokenType::Comment => continue,
+                TokenType::Literal => continue,
                 TokenType::Error => continue,
             }
         }

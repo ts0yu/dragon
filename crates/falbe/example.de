@@ -1,2 +1,5 @@
-1 2 add
+push 1=1 $1 
+push 1 +
+print =1
+jump 2
 halt
