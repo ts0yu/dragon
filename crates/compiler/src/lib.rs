@@ -1,2 +1,2 @@
-pub mod token;
 pub mod assembler;
+pub mod token;

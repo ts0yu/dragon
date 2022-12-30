@@ -50,27 +50,29 @@ pub enum TokenType {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Token<'a> {
-	pub ttype: TokenType,
-	pub slice: &'a str,
+    pub ttype: TokenType,
+    pub slice: &'a str,
 }
 
 impl<'a> Token<'a> {
-	pub fn new(ttype: TokenType, slice: &'a str) -> Self {
-		Self { ttype, slice }
-	}
-	
-	pub fn lex(raw: &'a str) -> Vec<Token> {
-		let mut tokens = Vec::new();
-		let mut lex = TokenType::lexer(raw);
-		
-		loop {
-			let z = lex.next();
-			if z == None { break }
-			tokens.push(Self::new(z.unwrap(), lex.slice()));
-		}
-        
+    pub fn new(ttype: TokenType, slice: &'a str) -> Self {
+        Self { ttype, slice }
+    }
+
+    pub fn lex(raw: &'a str) -> Vec<Token> {
+        let mut tokens = Vec::new();
+        let mut lex = TokenType::lexer(raw);
+
+        loop {
+            let z = lex.next();
+            if z == None {
+                break;
+            }
+            tokens.push(Self::new(z.unwrap(), lex.slice()));
+        }
+
         // tokens.push(Token::new(TokenType::Eof, ""));
 
-		tokens
-	}
+        tokens
+    }
 }

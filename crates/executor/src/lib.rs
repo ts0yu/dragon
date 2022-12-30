@@ -1,8 +1,8 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../README.md")]
 
-use std::collections::HashMap;
 use colored::*;
+use std::collections::HashMap;
 
 /// Type representing a Falbe VM opcode.
 #[derive(PartialEq, Debug)]
@@ -129,7 +129,7 @@ impl Vm {
     /// Duplicate the top stack value.
     fn dup(&mut self) {
         let a = self.stack[self.stack.len() - 1];
-    
+
         self.push(a);
     }
 
@@ -137,14 +137,14 @@ impl Vm {
     fn mul(&mut self) {
         let a = self.stack[self.stack.len() - 1];
         let b = self.stack[self.stack.len() - 2];
-    
+
         self.push(a * b);
     }
 
     /// Square root the top of the stack.
     fn sqrt(&mut self) {
         let a = self.stack[self.stack.len() - 1];
-    
+
         self.push(f64::sqrt(a));
     }
 
