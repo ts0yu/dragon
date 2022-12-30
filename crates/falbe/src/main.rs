@@ -32,7 +32,14 @@ fn main() {
             let now = Instant::now();
 
             let opcodes = Assembler::new(tokens).parse();
-            let mut vm = Vm::new(opcodes, HashMap::new());
+
+            let constants = HashMap::from([
+                (1, std::f64::consts::PI),
+                (2, std::f64::consts::TAU),
+                (3, std::f64::consts::E),
+            ]);
+
+            let mut vm = Vm::new(opcodes, constants);
 
             println!(
                 "{} dev [unoptimized] in {:?}",

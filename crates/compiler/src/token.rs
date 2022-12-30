@@ -38,6 +38,12 @@ pub enum TokenType {
     MulSymb,
     #[token("sqrt")]
     Sqrt,
+    #[token("pi")]
+    Pi,
+    #[token("tau")]
+    Tau,
+    #[token("e")]
+    E,
     #[regex(r"[//.*]+", logos::skip)] // Comments
     Comment,
     #[regex("[+-]?([0-9]*[.])?[0-9]+")]
