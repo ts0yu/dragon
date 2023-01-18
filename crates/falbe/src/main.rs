@@ -1,7 +1,9 @@
 use clap::{Parser, Subcommand};
 use colored::*;
 use compiler::assembler::Assembler;
+use compiler::assembler::Macro;
 use compiler::token::Token;
+use compiler::token::TokenType;
 use executor::Vm;
 use std::collections::HashMap;
 use std::fs;
@@ -26,12 +28,50 @@ fn main() {
         Commands::Run { path } => {
             let contents = fs::read_to_string(path).unwrap();
             let tokens = Token::lex(&contents);
+            let mut main_macro: Macro = Macro {
+                name: "",
+                body: Vec::new(),
+            };
+
+            let mut occurences: usize = 0;
+
+            tokens.clone().into_iter().for_each(|token| {
+                if token.ttype == TokenType::Macro {
+                    occurences += 1
+                }
+            });
+
+            let opcodes = Assembler::new(tokens);
+            let mut macros = HashMap::new();
+
+            for _ in 0..occurences {
+                let mmacro = opcodes.parse_macro();
+                macros.insert(mmacro.clone().unwrap().name, mmacro.unwrap());
+            }
+
+            match macros.get(&"main") {
+                Some(r#main) => main_macro = r#main.clone(),
+                None => panic!("no main macro found"),
+            }
+
+            for (i, n) in main_macro.clone().body.iter().enumerate() {
+                if n.ttype == TokenType::Identifier {
+                    let replacer = macros.get(&n.slice);
+                    let mut index: usize = i;
+
+                    for g in &replacer.unwrap().body {
+                        main_macro.body.insert(index, *g);
+                        index += 1;
+                    }
+                }
+            }
 
             println!("{} `{}`", "Compiling".green().bold(), path);
 
             let now = Instant::now();
+            let opcodes = Assembler::new(main_macro.body).assemble();
 
-            let opcodes = Assembler::new(tokens).parse();
+            println!("{opcodes:#?}");
 
             let constants = HashMap::from([
                 (1, std::f64::consts::PI),
@@ -48,7 +88,6 @@ fn main() {
             );
 
             println!("{} `{}`", "  Running".green().bold(), path);
-
             vm.execute();
         }
     }
