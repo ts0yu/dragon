@@ -44,11 +44,18 @@ pub enum TokenType {
     Tau,
     #[token("e")]
     E,
-    #[regex(r"[//.*]+", logos::skip)] // Comments
+	#[token("macro")]
+    Macro,
+	#[token("{")]
+    OpenBrace,
+	#[token("}")]
+    CloseBrace,
+	#[regex("[a-zA-Z_]+")]
+    Identifier,
+    #[regex(r"[//.*]+", logos::skip)]
     Comment,
     #[regex("[+-]?([0-9]*[.])?[0-9]+")]
     Literal,
-    // Eof,
     #[error]
     #[regex(r"[ \t\n\f]+", logos::skip)]
     Error,

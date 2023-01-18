@@ -1,5 +1,6 @@
 use crate::token::Token;
 use crate::token::TokenType;
+use std::cell::Cell;
 use executor::Opcode;
 
 /// Type representing an Opcode parser.
@@ -7,16 +8,57 @@ use executor::Opcode;
 pub struct Assembler<'a> {
     /// Tokens to be parsed.
     pub tokens: Vec<Token<'a>>,
+	/// Cursor
+	pub cursor: Cell<usize>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Macro<'a> {
+	pub name: &'a str,
+	pub body: Vec<Token<'a>>,
 }
 
 impl<'a> Assembler<'a> {
     /// Public constructor function that instantiates a `Parser`.
     pub fn new(tokens: Vec<Token<'a>>) -> Self {
-        Self { tokens }
+        Self { tokens, cursor: Cell::new(0) }
     }
 
-    /// Parse okens to Opcodes.
-    pub fn parse(&self) -> Vec<Opcode> {
+	/// Expand all macros.
+	pub fn parse_macro(&self) -> Result<Macro<'a>, ()> {
+		let mut body: Vec<Token<'a>> = Vec::new();
+		let mut name: &str = "";
+
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Macro)?;
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Identifier)?;
+		name = self.tokens[self.cursor.get() - 1].slice;
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::OpenBrace)?;
+
+		while self.tokens[self.cursor.get()].ttype != TokenType::CloseBrace {
+			body.push(self.tokens[self.cursor.get()]);
+			let mut curr = self.cursor.get();
+			curr += 1;
+			self.cursor.set(curr);
+		}
+
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::CloseBrace)?;
+
+		Ok(Macro { name, body })
+	}
+
+	pub fn match_token(&self, actual: TokenType, expected: TokenType) -> Result<(), ()> {
+		if actual == expected {
+			let mut curr = self.cursor.get();
+			curr += 1;
+			self.cursor.set(curr);
+			Ok(())
+		} else {
+			Err(())
+		}
+	}
+
+    /// Parse tokens to Opcodes.
+    pub fn assemble(&self) -> Vec<Opcode> {
         let mut opcodes = Vec::new();
         for (index, token) in self.tokens.iter().enumerate() {
             match token.ttype {
@@ -56,6 +98,8 @@ impl<'a> Assembler<'a> {
                 TokenType::Literal => continue,
                 TokenType::Error => continue,
                 TokenType::Comment => continue,
+				TokenType::Identifier => continue,
+				_ => panic!("test")
             }
         }
         opcodes
