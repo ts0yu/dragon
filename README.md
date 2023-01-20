@@ -1,3 +1,3 @@
 ## dragon
 
-dragon is a low-level systems programming language.
+dragon is a low-level EVM language optimized for writing highly mathematical code.
