@@ -1,4 +1,10 @@
-e 
-print
+const hello = 8.9
 
-halt
+macro test {
+    hello 1 add
+}
+
+macro main {
+    test hello add
+    halt
+}

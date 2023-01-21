@@ -26,8 +26,8 @@ pub enum TokenType {
     AddSymb,
     #[token("-")]
     SubSymb,
-    #[token("=")]
-    SetSymb,
+    // #[token("=")]
+    // SetSymb,
     #[token("$")]
     GetSymb,
     #[token("mul")]
@@ -45,12 +45,18 @@ pub enum TokenType {
     #[token("e")]
     E,
 	#[token("macro")]
-    Macro,
+    Macro,	
+    #[token("const")]
+    Constant,
+    #[token("=")]
+    Assign,
 	#[token("{")]
     OpenBrace,
 	#[token("}")]
     CloseBrace,
-	#[regex("[a-zA-Z_]+")]
+	#[regex("%[a-zA-Z_]+")]
+    Invocation,
+    #[regex("[a-zA-Z_]+")]
     Identifier,
     #[regex(r"[//.*]+", logos::skip)]
     Comment,

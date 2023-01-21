@@ -27,27 +27,46 @@ fn main() {
     match &value.command {
         Commands::Run { path } => {
             let contents = fs::read_to_string(path).unwrap();
+
             let tokens = Token::lex(&contents);
+
             let mut main_macro: Macro = Macro {
                 name: "",
                 body: Vec::new(),
             };
 
-            let mut occurences: usize = 0;
+            // let mut occurences: usize = 0;
 
-            tokens.clone().into_iter().for_each(|token| {
-                if token.ttype == TokenType::Macro {
-                    occurences += 1
-                }
-            });
+            // tokens.clone().into_iter().for_each(|token| {
+            //     if token.ttype == TokenType::Macro {
+            //         occurences += 1
+            //     }
+            // });
 
             let opcodes = Assembler::new(tokens);
-            let mut macros = HashMap::new();
 
-            for _ in 0..occurences {
-                let mmacro = opcodes.parse_macro();
-                macros.insert(mmacro.clone().unwrap().name, mmacro.unwrap());
+            let mut macros = HashMap::new();
+            let mut constants = HashMap::new();
+
+            loop {
+                let _m;
+                let _c;
+
+                match opcodes.parse_macro() {
+                    Ok(mac) => _m = macros.insert(mac.clone().name, mac).unwrap(),
+                    Err(_) => {
+                        match opcodes.parse_constant() {
+                            Ok(con) => _c = constants.insert(con.clone().name, con).unwrap(),
+                            Err(_) => break,
+                        };
+                    }
+                }
             }
+
+            // for _ in 0..occurences {
+            //     let mmacro = opcodes.parse_macro();
+            //     macros.insert(mmacro.clone().unwrap().name, mmacro.unwrap());
+            // }
 
             match macros.get(&"main") {
                 Some(r#main) => main_macro = r#main.clone(),
@@ -55,8 +74,10 @@ fn main() {
             }
 
             for (i, n) in main_macro.clone().body.iter().enumerate() {
-                if n.ttype == TokenType::Identifier {
-                    let replacer = macros.get(&n.slice);
+                let mut slice: f64;
+                if n.ttype == TokenType::Invocation {
+                    let invocation_name = &n.slice[0..n.slice.len() - 2];
+                    let replacer = macros.get(&invocation_name);
                     let mut index: usize = i;
 
                     for g in &replacer.unwrap().body {
@@ -65,6 +86,13 @@ fn main() {
                     }
                 }
             }
+
+            main_macro.body.iter_mut().for_each(|tok| if tok.ttype == TokenType::Identifier {
+                *tok = Token {
+                    ttype: TokenType::Literal,
+                    slice: &constants.get(&tok.slice).unwrap().value.to_string()
+                };
+            });
 
             println!("{} `{}`", "Compiling".green().bold(), path);
 

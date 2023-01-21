@@ -12,10 +12,23 @@ pub struct Assembler<'a> {
 	pub cursor: Cell<usize>,
 }
 
+/// Representation of a macro.
+/// A macro is essentially a block of opcodes that are pasted with the necessary arguments whenever invoked.
 #[derive(Debug, Clone)]
 pub struct Macro<'a> {
+    /// Name of the macro.
 	pub name: &'a str,
+    /// Body of the macro.
 	pub body: Vec<Token<'a>>,
+}
+
+/// Constants are inlined whenever they are referenced.
+#[derive(Debug, Clone)]
+pub struct Constant<'a> {
+    /// Name of the constant.
+	pub name: &'a str,
+    /// Value.
+	pub value: f64,
 }
 
 impl<'a> Assembler<'a> {
@@ -30,8 +43,9 @@ impl<'a> Assembler<'a> {
 		let mut name: &str = "";
 
 		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Macro)?;
-		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Identifier)?;
-		name = self.tokens[self.cursor.get() - 1].slice;
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Invocation)?;
+        let raw_invocation = self.tokens[self.cursor.get() - 1].slice;
+		name = &raw_invocation[0..raw_invocation.len() - 2];
 		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::OpenBrace)?;
 
 		while self.tokens[self.cursor.get()].ttype != TokenType::CloseBrace {
@@ -44,6 +58,22 @@ impl<'a> Assembler<'a> {
 		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::CloseBrace)?;
 
 		Ok(Macro { name, body })
+	}
+
+    /// Expand all macros.
+	pub fn parse_constant(&self) -> Result<Constant<'a>, ()> {
+		let mut name: &str = "";
+        let mut value: f64 = 0.0;
+
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Constant)?;
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Identifier)?;
+		name = self.tokens[self.cursor.get() - 1].slice;
+		self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Assign)?;
+
+        self.match_token(self.tokens[self.cursor.get()].ttype, TokenType::Literal)?;
+		value = self.tokens[self.cursor.get() - 1].slice.parse::<f64>().unwrap();
+
+		Ok(Constant { name, value })
 	}
 
 	pub fn match_token(&self, actual: TokenType, expected: TokenType) -> Result<(), ()> {
@@ -78,9 +108,9 @@ impl<'a> Assembler<'a> {
                 TokenType::AddSymb => opcodes.push(Opcode::Add),
                 TokenType::MulSymb => opcodes.push(Opcode::Mul),
                 TokenType::SubSymb => opcodes.push(Opcode::Sub),
-                TokenType::SetSymb => opcodes.push(Opcode::Set(
-                    self.tokens[index + 1].slice.parse::<usize>().unwrap(),
-                )),
+                // TokenType::SetSymb => opcodes.push(Opcode::Set(
+                //     self.tokens[index + 1].slice.parse::<usize>().unwrap(),
+                // )),
                 TokenType::GetSymb => opcodes.push(Opcode::Get(
                     self.tokens[index + 1].slice.parse::<usize>().unwrap(),
                 )),
