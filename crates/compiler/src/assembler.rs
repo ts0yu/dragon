@@ -1,4 +1,5 @@
 use crate::token::Token;
+use std::collections::HashMap;
 use crate::token::TokenType;
 use std::cell::Cell;
 use executor::Opcode;
@@ -88,7 +89,7 @@ impl<'a> Assembler<'a> {
 	}
 
     /// Parse tokens to Opcodes.
-    pub fn assemble(&self) -> Vec<Opcode> {
+    pub fn assemble(&self, lookup_table: HashMap<&str, Constant>) -> Vec<Opcode> {
         let mut opcodes = Vec::new();
         for (index, token) in self.tokens.iter().enumerate() {
             match token.ttype {
@@ -128,8 +129,10 @@ impl<'a> Assembler<'a> {
                 TokenType::Literal => continue,
                 TokenType::Error => continue,
                 TokenType::Comment => continue,
-				TokenType::Identifier => continue,
-				_ => panic!("test")
+				TokenType::Identifier => {
+                    opcodes.push(Opcode::Push(lookup_table.get(&token.clone().slice).unwrap().value.to_string().parse::<f64>().unwrap()))
+                },
+				_ => panic!("parsing error")
             }
         }
         opcodes

@@ -1,10 +1,8 @@
 const hello = 8.9
 
-macro test {
-    hello 1 add
-}
-
 macro main {
-    test hello add
+    hello 
+    push 1 +
+    print
     halt
 }

@@ -56,7 +56,9 @@ fn main() {
                     Ok(mac) => _m = macros.insert(mac.clone().name, mac).unwrap(),
                     Err(_) => {
                         match opcodes.parse_constant() {
-                            Ok(con) => _c = constants.insert(con.clone().name, con).unwrap(),
+                            Ok(con) => {
+                                _c = constants.insert(con.clone().name, con);
+                            },
                             Err(_) => break,
                         };
                     }
@@ -87,17 +89,10 @@ fn main() {
                 }
             }
 
-            main_macro.body.iter_mut().for_each(|tok| if tok.ttype == TokenType::Identifier {
-                *tok = Token {
-                    ttype: TokenType::Literal,
-                    slice: &constants.get(&tok.slice).unwrap().value.to_string()
-                };
-            });
-
             println!("{} `{}`", "Compiling".green().bold(), path);
 
             let now = Instant::now();
-            let opcodes = Assembler::new(main_macro.body).assemble();
+            let opcodes = Assembler::new(main_macro.clone().body).assemble(constants);
 
             println!("{opcodes:#?}");
 
