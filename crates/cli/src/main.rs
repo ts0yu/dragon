@@ -1,13 +1,12 @@
+use std::{collections::HashMap, fs, time::Instant};
+
 use clap::{Parser, Subcommand};
 use colored::*;
-use compiler::assembler::Assembler;
-use compiler::assembler::Macro;
-use compiler::token::Token;
-use compiler::token::TokenType;
+use compiler::{
+    assembler::{Assembler, Macro},
+    token::{Token, TokenType},
+};
 use executor::Vm;
-use std::collections::HashMap;
-use std::fs;
-use std::time::Instant;
 
 #[derive(Parser)]
 #[clap(about, version, author)]
@@ -58,7 +57,7 @@ fn main() {
                         match opcodes.parse_constant() {
                             Ok(con) => {
                                 _c = constants.insert(con.clone().name, con);
-                            },
+                            }
                             Err(_) => break,
                         };
                     }
