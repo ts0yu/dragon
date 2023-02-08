@@ -35,6 +35,20 @@ pub enum Opcode {
     Halt,
 }
 
+impl std::fmt::Display for Program {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match i {
+			Opcode::Push(v) => write!(f, "{} {}", self, v),
+			Opcode::Jump(v) => write!(f, "{} {}", self, v),
+			Opcode::Set(v) => write!(f, "{} {}", self, v),
+			Opcode::Get(v) => write!(f, "{} {}", self, v),
+			_ => write!(f, "{}", self),
+		};			
+
+		Ok(())
+    }
+}
+
 /// Type representing a Falbe virtual machine.
 #[derive(PartialEq, Debug)]
 pub struct Vm {
