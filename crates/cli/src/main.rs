@@ -1,11 +1,17 @@
-use std::{collections::HashMap, fs, time::Instant};
-
 use clap::{Parser, Subcommand};
 use colored::*;
+
 use compiler::{
-    assembler::{Assembler, Macro},
-    token::{Token, TokenType},
+	assembler::{Assembler, Macro},
+	token::{Token, TokenType}
 };
+
+use std::{
+	fs, 
+	time::Instant,
+	collections::HashMap
+};
+
 use executor::Vm;
 
 #[derive(Parser)]
@@ -26,48 +32,57 @@ fn main() {
     match &value.command {
         Commands::Run { path } => {
             let contents = fs::read_to_string(path).unwrap();
-
             let tokens = Token::lex(&contents);
-
             let mut main_macro: Macro = Macro {
                 name: "",
                 body: Vec::new(),
             };
 
-            // let mut occurences: usize = 0;
+            let mut occurences: usize = 0;
 
-            // tokens.clone().into_iter().for_each(|token| {
-            //     if token.ttype == TokenType::Macro {
-            //         occurences += 1
-            //     }
-            // });
+            tokens.clone().into_iter().for_each(|token| {
+                if token.ttype == TokenType::Macro {
+                    occurences += 1
+                }
+            });
 
             let opcodes = Assembler::new(tokens);
-
             let mut macros = HashMap::new();
-            let mut constants = HashMap::new();
+			
+            // let mut constants = HashMap::new();
 
-            loop {
-                let _m;
-                let _c;
+            // match opcodes.parse_macro() {
+            // 	Ok(mac) => {
+            // 		macros.insert(mac.clone().name, mac);
+            // 	}
+            // 	Err(_) => {
+            // 		match opcodes.parse_variable() {
+            // 			Ok(var) => constants.insert(var.clone().name, var),
+            // 			Err(_) => continue,
+            // 		}
+            // 	}
+            // }
 
-                match opcodes.parse_macro() {
-                    Ok(mac) => _m = macros.insert(mac.clone().name, mac).unwrap(),
-                    Err(_) => {
-                        match opcodes.parse_constant() {
-                            Ok(con) => {
-                                _c = constants.insert(con.clone().name, con);
-                            }
-                            Err(_) => break,
-                        };
-                    }
+			// let constants = opcodes.parse_variable();
+
+			// println!("{constants:?}");
+
+            for _ in 0..occurences {
+                let mac = opcodes.parse_macro().unwrap();
+
+                if macros.get(&mac.name).is_some() {
+                    println!(
+                        "{}: macro with name `{}` already exists",
+                        "error".red().bold(),
+                        &mac.name
+                    );
+                    std::process::exit(1);
+                }
+
+                if macros.get(&mac.name).is_none() {
+                    macros.insert(mac.clone().name, mac);
                 }
             }
-
-            // for _ in 0..occurences {
-            //     let mmacro = opcodes.parse_macro();
-            //     macros.insert(mmacro.clone().unwrap().name, mmacro.unwrap());
-            // }
 
             match macros.get(&"main") {
                 Some(r#main) => main_macro = r#main.clone(),
@@ -75,10 +90,8 @@ fn main() {
             }
 
             for (i, n) in main_macro.clone().body.iter().enumerate() {
-                let mut slice: f64;
-                if n.ttype == TokenType::Invocation {
-                    let invocation_name = &n.slice[0..n.slice.len() - 2];
-                    let replacer = macros.get(&invocation_name);
+                if n.ttype == TokenType::Identifier {
+                    let replacer = macros.get(&n.slice);
                     let mut index: usize = i;
 
                     for g in &replacer.unwrap().body {
@@ -91,9 +104,11 @@ fn main() {
             println!("{} `{}`", "Compiling".green().bold(), path);
 
             let now = Instant::now();
-            let opcodes = Assembler::new(main_macro.clone().body).assemble(constants);
+            let opcodes = Assembler::new(main_macro.body).assemble();
 
-            println!("{opcodes:#?}");
+            for i in opcodes {
+                println!("{i}");
+            }
 
             let constants = HashMap::from([
                 (1, std::f64::consts::PI),
